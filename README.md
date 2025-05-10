@@ -5,17 +5,40 @@ The application enables users to upload their own PDF books and automatically ge
 
 # Installation Guidline
 
-### Create a conda environment:
+## Create a conda environment:
 ```
 conda create -n {your environment}
 ```
 
-### Activate the created environment:
+## Activate the created environment:
 ```
 conda activate {your environment}
 ```
 
-### Install neccessary packages:
+## Install neccessary packages:
 ```
 pip install -r requirements.txt
+```
+
+## Clone this project
+To clone this project, run:
+```
+git clone https://github.com/HaiNguyen2903/LLM-Book-Summary
+```
+
+Move to the repo folder:
+```
+cd LLM-Book-Summary
+```
+
+## Export API key to local environment
+In order to use OpenAI API key, activate your virtual enviroment and run the following script:
+```
+export OPENAI_API_KEY="YOUR_API_KEY"
+```
+
+# Run the application
+In order to run the streamlit app, run:
+```
+streamlit run app.py
 ```
