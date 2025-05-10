@@ -1,0 +1,8 @@
+{
+    "DATA_DIR": "datasets",
+    "PROMPT_DIR": "prompts",
+    "OUTPUT_DIR": "outputs",
+    "SUMMARY_DIR": "summaries",
+    "BOOK_STRUCTURE_DIR": "book_structures",
+    "EVAL_RESULT_DIR": "eval_results"
+}

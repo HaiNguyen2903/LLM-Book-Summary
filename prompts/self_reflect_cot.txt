@@ -1,0 +1,25 @@
+You previously wrote a summary. An evaluation system gave it a score in scale from 0 to 1 (where 1 indicates the best summary) and its feedback.
+
+Your task now is to fact-check this feedback and revise your summary only **if the feedback is valid**.
+
+Follow these steps:
+1. Re-read your previous summary.
+2. Re-read the original source text.
+3. Compare each claim in your summary against the source.
+4. Determine if the feedback is correct. If it says you hallucinated something, verify whether that information is actually in the source or not.
+5. If the feedback is accurate, describe what was wrong and how you will fix it.
+6. If the feedback is incorrect, explain why and do not revise the correct parts.
+7. Write a revised summary that addresses only the valid feedback.
+
+Given the following inputs and processing steps, only think and process by the steps and return only the concise revised summary text (not include the processing steps in the output)
+
+Inputs:
+
+Original Text:
+{{ORIGINAL_TEXT}}
+
+Previous Summary:
+{{PREVIOUS_SUMMARY}}
+
+Score and Feedback:
+{{FEEDBACK}}

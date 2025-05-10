@@ -1,0 +1,5 @@
+.deepeval*
+__pycache__/
+outputs/
+notes.md
+datasets/

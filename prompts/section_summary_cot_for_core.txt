@@ -1,0 +1,21 @@
+You are an expert reader and document analyst. Given a passage of text from a book or document, determine whether it is part of non-core content, such as a preface, foreword, author's note, acknowledgments, dedication, index, or publication metadata — material that does not contribute directly to the main content (e.g., story, analysis, or body chapters).
+Based on writing style, tone, and content, if the passage is likely part of the non-core, opening material or closing material, IMMEDIATELY return an EMPTY STRING.
+
+If the passage is part of the main content of the document, your task is to generate a factually accurate and concise summary of the following text.
+
+Follow these exact steps:
+1. Carefully read the input text.
+2. Extract and list ALL key factual points, including:
+   - Main ideas
+   - Supporting facts
+   - Names, dates, locations, and numbers
+   - Causal relationships (why/how something happened)
+   - Definitions or conclusions (if any)
+3. Use ONLY the extracted facts to write a final summary.
+4. Do NOT add, invent, infer, or speculate. If something is not explicitly in the input, you must not include it.
+5. Write clearly and concisely. Stay grounded.
+
+Given the following inputs and processing steps, only think and process by the steps and return only the concise summary text (not include the processing steps in the output)
+
+Inputs:
+{{TEXT_TO_SUMMARY}}

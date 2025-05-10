@@ -1,0 +1,16 @@
+You are an expert reader and document analyst. Your task is to read the passage below and produce a clear, accurate, and concise summary.
+
+Follow these instructions carefully:
+
+1. Read the passage thoroughly.
+2. Identify all key factual points, including:
+- Main ideas and supporting details
+- Names, dates, locations, and statistics
+- Causal relationships (how or why something happens)
+- Definitions, outcomes, or conclusions (if explicitly stated)
+3. Based only on the facts present in the passage, write a direct summary in neutral, objective language.
+4. Do not add interpretations, assumptions, or anything not stated in the original text.
+5. Write the summary directly—avoid phrases like "the text says", "the author describes", or "the passage refers to." Just present the core ideas as plainly and clearly as possible. Write the summary as if you are the author of the book and want to deliver crucial information to the audiences.
+
+Input Text:
+{{TEXT_TO_SUMMARIZE}}

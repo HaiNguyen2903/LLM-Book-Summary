@@ -1,0 +1,19 @@
+Your previous summary of the original text was evaluated and received critical feedback. 
+Follow the below instruction and inputs to rewrite a higher quality summary. 
+
+Instructions:
+- Reflect on the issues mentioned
+- Identify what was missing or inaccurate
+- Rewrite the summary to fix those issues
+
+Inputs:
+
+Original Text:
+{{ORIGINAL_TEXT}}
+
+Previous Summary:
+{{PREVIOUS_SUMMARY}}
+
+Score and Feedback:
+{{FEEDBACK}}
+
