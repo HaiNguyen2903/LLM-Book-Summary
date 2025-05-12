@@ -3,7 +3,7 @@ import openai
 import json
 from utils import mkdir_if_not_exists
 import os.path as osp
-from deepeval import evaluate
+# from deepeval import evaluate
 from deepeval.test_case import LLMTestCase
 from deepeval.metrics import SummarizationMetric
 from document import PDF_Document
