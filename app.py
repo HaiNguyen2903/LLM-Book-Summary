@@ -5,125 +5,105 @@ from document import PDF_Document
 from summarizer import Summarizer
 import os.path as osp
 import fitz  # PyMuPDF for PDF preview
-import time
 import shutil
+from streamlit import session_state as ss
 
-# Set up the Streamlit app
-st.set_page_config(
-    page_title="PDF Document Analyzer",
-    page_icon="📕",
-    layout="wide"
-)
+def init_session_state():
+    # Initialize session state
+    if 'uploaded_file' not in ss:
+        ss.uploaded_file = None
+    if 'summary' not in ss:
+        ss.summary = None
+    if 'preview_image' not in ss:
+        ss.preview_image = None
+    if 'doc_stats' not in ss:
+        ss.doc_stats = None
+    if 'summary_style' not in ss:
+        ss.summary_style = list(SUMMARY_STYLES.keys())[0]
+    if 'temp_path' not in ss:
+        ss.temp_path = None
 
-# Initialize session state
-if 'processed_doc' not in st.session_state:
-    st.session_state.processed_doc = None
-if 'summary' not in st.session_state:
-    st.session_state.summary = None
-if 'preview_image' not in st.session_state:
-    st.session_state.preview_image = None
-if 'doc_stats' not in st.session_state:
-    st.session_state.doc_stats = None
+def update_summary_options():
+    with st.sidebar:
+        st.header("Summary Style")
+        style_options = list(SUMMARY_STYLES.keys())
+        selected_style = st.selectbox(
+            "Choose summary style:",
+            style_options,
+            index=style_options.index(ss.summary_style) if ss.summary_style in style_options else 0,
+            help="\n\n".join([f"**{k}**: {v['description']}" for k, v in SUMMARY_STYLES.items()])
+        )
+        ss.summary_style = selected_style
+        st.markdown(f"**Description:** {SUMMARY_STYLES[selected_style]['description']}")
 
-# App title and description
-st.title("📕 LLM Book Summarizer")
-st.markdown("Upload a PDF document to view its metadata and summary.")
+def update_uploaded_file(uploaded_file):
+    if uploaded_file is not None:
+        # Save file temporarily
+        temp_path = Path("temp") / uploaded_file.name
+        temp_path.parent.mkdir(exist_ok=True)
 
-# Load config
-with open('config.json', 'r') as f:
-    config = json.load(f)
+        with open(temp_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
 
-summarizer = Summarizer(config)
-summary_prompt_path = osp.join(config["PROMPT_DIR"], "summary_chain_of_thought.txt")
-
-# File uploader
-uploaded_file = st.file_uploader("Upload PDF", type="pdf")
-
-if uploaded_file is not None and st.session_state.processed_doc is None:
-    # Show upload progress
-    # progress_bar = st.progress(0)
-    status_text = st.empty()
-    
-    # # Simulate upload progress
-    # for i in range(100):
-    #     progress_bar.progress(i + 1)
-    #     status_text.text(f"Uploading... {i + 1}%")
-    #     time.sleep(0.01)
-    
-    # Save file temporarily
-    temp_path = Path("temp") / uploaded_file.name
-    temp_path.parent.mkdir(exist_ok=True)
-    
-    with open(temp_path, "wb") as f:
-        f.write(uploaded_file.getbuffer())
-    
-    status_text.text("Upload complete!")
-    # progress_bar.empty()
-    
-    try:
         # Create PDF_Document instance
         doc = PDF_Document(file_path=str(temp_path), config=config)
         
         # Store in session state
-        st.session_state.processed_doc = doc
-        
-        # Process PDF preview
-        pdf_document = fitz.open(temp_path)
-        first_page = pdf_document[0]
-        pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
-        img_data = pix.tobytes("png")
-        
-        # Store preview and stats in session state
-        st.session_state.preview_image = img_data
-        st.session_state.doc_stats = {
-            'total_pages': len(pdf_document),
-            'file_size': f"{uploaded_file.size / 1024:.2f} KB"
-        }
-        
-        pdf_document.close()
-        
-    except Exception as e:
-        st.error(f"Error processing document: {str(e)}")
+        ss.uploaded_file = doc
+        ss.temp_path = temp_path
+    else:
+        # reset session state
+        ss.uploaded_file = None
+        ss.temp_path = None
+        ss.preview_image = None
+        ss.doc_stats = None
+        ss.summary = None
 
-    finally:
-        # Clean up temporary files
-        if temp_path.exists():
-            temp_path.unlink()
-        if Path("temp").exists():
-            shutil.rmtree("temp")
+def update_book_info():
+    with st.sidebar:
+        if ss.uploaded_file is not None:
+            # display preview
+            st.header("Document Preview")
 
-# Display the processed document information
-if st.session_state.processed_doc is not None:
-    # Create two columns for layout (1:2 ratio for better summary display)
-    col1, col2 = st.columns([1, 2])
-    
-    with col1:
-        # Document preview
-        st.subheader("Document Preview")
-        st.image(st.session_state.preview_image, caption="First Page Preview")
+            pdf_doc = fitz.open(ss.temp_path)
 
-        # Document metadata
-        st.subheader("Document Information")
-        st.write(f"**Name:** {st.session_state.processed_doc.name}")
-        st.write(f"**Author:** {st.session_state.processed_doc.author}")
-        st.write(f"**File Size:** {st.session_state.doc_stats['file_size']}")
-        st.write(f"**Total Pages:** {st.session_state.doc_stats['total_pages']}")
-        
-        # Summarize button
+            first_page = pdf_doc[0]
+            pix = first_page.get_pixmap(matrix=fitz.Matrix(2, 2))
+            img_data = pix.tobytes("png")
+            ss.preview_image = img_data
+
+            st.sidebar.image(ss.preview_image, caption="First Page Preview")
+
+            # display book info
+            ss.doc_stats = {
+                'total_pages': len(pdf_doc),
+                'file_size': f"{uploaded_file.size / 1024:.2f} KB"
+            }
+
+            st.write(f"**Name:** {ss.uploaded_file.name}")
+            st.write(f"**Author:** {ss.uploaded_file.author}")
+            st.write(f"**File Size:** {ss.doc_stats['file_size']}")
+            st.write(f"**Total Pages:** {ss.doc_stats['total_pages']}")
+
+
+def update_summary():
+    if ss.uploaded_file is not None:
         if st.button("Generate Summary"):
+            # generate summary
             with st.spinner("Generating summary..."):
+                summarizer = Summarizer(config)
                 summary = summarizer._get_doc_summary(
-                    document=st.session_state.processed_doc,
-                    summary_prompt_path=summary_prompt_path,
+                    document=ss.uploaded_file,
+                    summary_prompt_path=osp.join(
+                        config["PROMPT_DIR"],
+                        SUMMARY_STYLES[ss.summary_style]["prompt_file"]
+                    ),
                     save=False
                 )
-                st.session_state.summary = summary
-    
-    with col2:
-        # Summary section
-        if st.session_state.summary:
-            st.subheader("Document Summary")
-            # Create a container with fixed height and scrolling
+                ss.summary = summarizer.format_doc_summary(summary)
+
+            # display summary
+            st.header("Document Summary")
             with st.container():
                 # Convert the first line to a proper header if it starts with #
                 summary_lines = st.session_state.summary.split('\n')
@@ -139,12 +119,58 @@ if st.session_state.processed_doc is not None:
                     """,
                     unsafe_allow_html=True
                 )
-            
-            st.write("---")
-            # Download button
+
+            st.write("   ") 
+
             st.download_button(
                 label="Download Summary",
                 data=st.session_state.summary,
-                file_name=f"{st.session_state.processed_doc.name}_summary.md",
+                file_name=f"{st.session_state.uploaded_file.name}_summary.md",
                 mime="text/markdown"
             )
+
+if __name__ == '__main__':
+
+    # --- Summary Style Definitions ---
+    SUMMARY_STYLES = {
+        "Analytic Summary": {
+            "prompt_file": "summary_cot_analytic_style.txt",
+            "description": "Concise, analytical, and natural-sounding summary in the book's intellectual voice."
+        },
+        "Bullet-Point Summary": {
+            "prompt_file": "summary_cot_bullet_style.txt",
+            "description": "Clear, scannable bullet-point summary for quick reference."
+        },
+        "Narrative Summary": {
+            "prompt_file": "summary_cot_narrative_style.txt",
+            "description": "Narrative summary with a focus on the story and characters."
+        }
+    }
+
+    with open('config.json', 'r') as f:
+        config = json.load(f)
+
+    # Set up the Streamlit app
+    st.set_page_config(
+        page_title="Book Summarizer",
+        page_icon="📕",
+        layout="wide"
+    )
+
+    # App title and description
+    st.title("📕 LLM Book Summarizer")
+    st.markdown("Upload a PDF document to view its metadata and summary.")
+
+    # # File uploader
+    uploaded_file = st.file_uploader("Upload PDF", type="pdf")
+
+    # initialize session state
+    init_session_state()
+    # update summary options
+    update_summary_options()
+    # update uploaded file
+    update_uploaded_file(uploaded_file)
+    # update book info
+    update_book_info()
+    # update summary    
+    update_summary()

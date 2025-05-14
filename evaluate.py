@@ -1,9 +1,7 @@
 from custom_summarization_metric import CustomSummarizationMetric
 from deepeval.test_case import LLMTestCase
 from deepeval import evaluate
-from deepeval.metrics import SummarizationMetric
 import json
-from IPython import embed
 import os.path as osp
 from utils import mkdir_if_not_exists
 
@@ -66,7 +64,48 @@ def get_full_content_dict(json_data):
         process_item(item)
     return sections
 
-def eval_summaries(summary_path, book_structure_path, save_result=True):
+def eval_summaries(summary_path, save_result=True):
+    with open(summary_path, 'r') as f:
+        summary_dict = json.load(f)
+
+    summary_dict = {k: v for k, v in summary_dict.items() if v['text'] != ''}
+
+    test_cases = []
+
+    for _, item in summary_dict.items():
+        if item['text'] == '':
+            continue
+
+        original_text = item['text']
+        summary = item['summary']
+
+        test_case = LLMTestCase(input=original_text, actual_output=summary)
+        test_cases.append(test_case)
+
+    custom_summarization_metric = CustomSummarizationMetric(n_complex_questions = 3, 
+                                                            verbose_mode=False)
+
+    eval_result = evaluate(test_cases, [custom_summarization_metric])
+
+    result_dict = {}
+
+    for i, chunk_id in enumerate(summary_dict.keys()):
+        summarization_metric_logs = json.loads(eval_result.test_results[i].metrics_data[0].verbose_logs)
+        result_dict[chunk_id] = summarization_metric_logs
+
+    # save_result
+    if save_result:
+        save_dir = osp.dirname(summary_path)
+        mkdir_if_not_exists(save_dir)
+        with open(osp.join(save_dir, 'eval_results.json'), 'w') as f:
+            json.dump(result_dict, f)
+
+    return result_dict
+
+    
+        
+
+    return 
     summary_dict = get_summary_dict(summary_path)
 
     # ignore table of contents and empty sections
@@ -108,10 +147,11 @@ def eval_summaries(summary_path, book_structure_path, save_result=True):
     
 
 if __name__ == '__main__':
-    book_dir = 'outputs/Self-Development/Atomic Habits'
+    book_dir = 'outputs/Self-Development/Rich Dad Poor Dad'
 
-    book_structure_path = osp.join(book_dir, 'structure.json')
-    summary_path = osp.join(book_dir, 'summary.md')
+    # book_structure_path = osp.join(book_dir, 'structure.json')
+    # summary_path = osp.join(book_dir, 'summary.md')
 
-    print(osp.dirname(summary_path))
-    # eval_summaries(summary_path, book_structure_path)
+    summary_path = 'outputs/Self-Development/Rich Dad Poor Dad/summary.json'
+
+    eval_summaries(summary_path)

@@ -1,8 +1,0 @@
-You are an expert reader and document analyst. Given a passage of text from a book or document, determine whether it is part of non-core content, such as a preface, foreword, author's note, acknowledgments, dedication, index, or publication metadata — material that does not contribute directly to the main content (e.g., story, analysis, or body chapters).
-Based on writing style, tone, and content, output only one of the following (without explanation):
-
-True — if the passage is likely part of the non-core, opening material.
-False — if the passage is part of the main content of the document.
-
-Inputs: 
-{{INPUT_TEXT}}

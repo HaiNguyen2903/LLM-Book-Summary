@@ -28,6 +28,27 @@ class Summarizer:
         with open(file_path, "r") as f:
             return f.read()
         
+    def _get_chunk_summaries(self, chunks: dict, summary_prompt: str) -> dict:
+        summaries = {}
+        id = 0
+        for chunk_id, chunk in chunks.items():
+            if id >= 2:
+                return summaries
+            
+            text = chunk['text']
+            if text == '':
+                chunk['summary'] = ''
+            else:
+                summary = self._get_response(
+                    instruction=summary_prompt,
+                    user_input=text
+                )
+                chunk['summary'] = summary
+            summaries[chunk_id] = chunk
+
+            id += 1
+        return summaries
+
     def _get_section_summary(self, doc_item: dict, summary_prompt: str) -> str:
         title = doc_item['title']
         level = doc_item['level']
@@ -73,28 +94,43 @@ class Summarizer:
         return toc + '\n\n' + content
     
     def _get_doc_summary(self, document: PDF_Document, summary_prompt_path: str, save=True) -> str:
-        doc_name = document.name
-        doc_contents = document.contents[:2]
+        doc_contents = document.contents
         
         summary_prompt = self._load_prompt(summary_prompt_path)
 
-        full_summary = ""
-
-        # get summary for each section
-        for item in doc_contents:
-            full_summary += self._get_section_summary(doc_item=item, summary_prompt=summary_prompt)
-
-        # add toc to the full summary
-        full_summary = self._add_toc(full_summary)
+        final_summary = self._get_chunk_summaries(chunks=doc_contents, summary_prompt=summary_prompt)
 
         save_dir = document.save_dir
+        # store save_dir
+        self.save_dir = save_dir
 
         mkdir_if_not_exists(save_dir)
 
         if save:
-            save_txt_and_md_file(osp.join(save_dir, 'summary.md'), full_summary)
+            with open(osp.join(save_dir, 'summary.json'), 'w') as f:
+                json.dump(final_summary, f, indent=2, ensure_ascii=False)
 
-        return full_summary
+        return final_summary
+    
+    def format_doc_summary(self, summary: dict, save=False) -> str:
+        formatted_summary = ""
+        for _, chunk in summary.items():
+            prefix = '#' * (chunk['level']+1)
+
+            if chunk['summary'] == '':
+                formatted_summary += f"{prefix} {chunk['title']}\n\n"
+            else:
+                formatted_summary += f"{prefix} {chunk['title']}\n\n{chunk['summary']}\n\n"
+
+        # add toc to the full summary
+        formatted_summary = self._add_toc(formatted_summary)
+
+        if save:
+            self.save_dir = 'outputs/Self-Development/Rich Dad Poor Dad'
+            mkdir_if_not_exists(self.save_dir)
+            save_txt_and_md_file(osp.join(self.save_dir, 'formatted_summary.md'), formatted_summary)
+
+        return formatted_summary
                     
     
     def _get_self_reflective_summary(self, input_text, summary_prompt_path,
@@ -166,14 +202,17 @@ def main():
 
     summarizer = Summarizer(config=config)
 
-    doc_path = 'datasets/books/Self-Development/Atomic Habits.pdf'
-    doc = PDF_Document(doc_path)
+    doc_path = 'datasets/books/Self-Development/Rich Dad Poor Dad.pdf'
+    doc = PDF_Document(doc_path, config=config)
     
-    summary_prompt_path = osp.join(config["PROMPT_DIR"], "summary_chain_of_thought.txt")
-    self_reflect_prompt_path = osp.join(config['PROMPT_DIR'], 'self_reflect_cot.txt')
+    summary_prompt_path = osp.join(config["PROMPT_DIR"], "summary_cot_narrative.txt")
 
-    # with open('summaries/deep_work/Introduction.txt', 'r') as f:
-    #     input = f.read()
+    summarizer._get_doc_summary(document=doc,
+                            summary_prompt_path=summary_prompt_path,
+                            save=True)
+
+
+    # self_reflect_prompt_path = osp.join(config['PROMPT_DIR'], 'self_reflect_cot.txt')
 
     # summary = agent._get_self_reflective_summary(input_text=input, summary_prompt_path=summary_prompt_path,
     #                                              self_reflect_prompt_path=self_reflect_prompt_path,
@@ -181,9 +220,10 @@ def main():
     
     # print('FINAL SUMMARY:', summary)
 
-    summarizer._get_doc_summary(document=doc,
-                            summary_prompt_path=summary_prompt_path,
-                            save=True)
+    # with open('outputs/Self-Development/Rich Dad Poor Dad/summary.json', 'r') as f:
+    #     summary = json.load(f)
+
+    # formatted_summary = summarizer.format_doc_summary(summary=summary, save=True)
 
     return
 

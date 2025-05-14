@@ -4,5 +4,6 @@
     "OUTPUT_DIR": "outputs",
     "SUMMARY_DIR": "summaries",
     "BOOK_STRUCTURE_DIR": "book_structures",
-    "EVAL_RESULT_DIR": "eval_results"
+    "EVAL_RESULT_DIR": "eval_results",
+    "MAX_CHUNK_LENGTH": 2000
 }
