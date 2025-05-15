@@ -4,6 +4,7 @@ from deepeval import evaluate
 import json
 import os.path as osp
 from utils import mkdir_if_not_exists
+import argparse
 
 def get_summary_dict(md_path: str) -> dict:
     """
@@ -64,7 +65,7 @@ def get_full_content_dict(json_data):
         process_item(item)
     return sections
 
-def eval_summaries(summary_path, save_result=True):
+def eval_summaries(summary_path, summary_style, save_result=True):
     with open(summary_path, 'r') as f:
         summary_dict = json.load(f)
 
@@ -97,61 +98,17 @@ def eval_summaries(summary_path, save_result=True):
     if save_result:
         save_dir = osp.dirname(summary_path)
         mkdir_if_not_exists(save_dir)
-        with open(osp.join(save_dir, 'eval_results.json'), 'w') as f:
+        with open(osp.join(save_dir, f'eval_results_{summary_style}.json'), 'w') as f:
             json.dump(result_dict, f)
 
     return result_dict
-
-    
-        
-
-    return 
-    summary_dict = get_summary_dict(summary_path)
-
-    # ignore table of contents and empty sections
-    summary_dict = {k: v for k, v in summary_dict.items() if k != 'Table of Contents' and v != ''}
-
-    with open(book_structure_path, 'r') as f:
-        book_structure = json.load(f)
-
-    full_content = get_full_content_dict(book_structure)
-
-    test_cases = []
-
-    # adding test cases for each section
-    for section in summary_dict.keys():
-        test_cases.append(LLMTestCase(
-            input = full_content[section],
-            actual_output = summary_dict[section]
-        ))
-
-    custom_summarization_metric = CustomSummarizationMetric(n_complex_questions = 5, 
-                                                            verbose_mode=False)
-
-    eval_result = evaluate(test_cases, [custom_summarization_metric])
-
-    result_dict = {}
-
-    for i, section in enumerate(summary_dict.keys()):
-        summarization_metric_logs = json.loads(eval_result.test_results[i].metrics_data[0].verbose_logs)
-        result_dict[section] = summarization_metric_logs
-
-    # save_result
-    if save_result:
-        save_dir = osp.dirname(summary_path)
-        mkdir_if_not_exists(save_dir)
-        with open(osp.join(save_dir, 'eval_results.json'), 'w') as f:
-            json.dump(result_dict, f)
-
-    return result_dict
-    
 
 if __name__ == '__main__':
-    book_dir = 'outputs/Self-Development/Rich Dad Poor Dad'
+    # summary_path = 'outputs/Self-Development/Atomic Habits/summary.json'
 
-    # book_structure_path = osp.join(book_dir, 'structure.json')
-    # summary_path = osp.join(book_dir, 'summary.md')
-
-    summary_path = 'outputs/Self-Development/Rich Dad Poor Dad/summary.json'
-
-    eval_summaries(summary_path)
+    parser = argparse.ArgumentParser(description="Book summarizer")
+    parser.add_argument('--style', type=str, default='analytic', help='summary style')
+    parser.add_argument('--summary_path', type=str, required=True, help='document path')
+    
+    args = parser.parse_args()
+    eval_summaries(args.summary_path, args.style)

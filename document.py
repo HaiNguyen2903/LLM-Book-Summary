@@ -19,7 +19,6 @@ class PDF_Document:
         self.max_chunk_length = config['MAX_CHUNK_LENGTH']
         # save directory
         self.save_dir = osp.join(self.config['OUTPUT_DIR'], self.category, self.name)
-        mkdir_if_not_exists(self.save_dir)
         
         self.save_structure = save_structure
         # self.contents = self._extract_toc_hierarchical()
@@ -62,8 +61,8 @@ class PDF_Document:
         }
 
         if self.save_structure:
-            mkdir_if_not_exists('book_structures')
-            with open(osp.join('book_structures', f'{self.name}.json'), "w", encoding="utf-8") as f:
+            mkdir_if_not_exists(self.save_dir)
+            with open(osp.join(self.save_dir, f'{self.name}.json'), "w", encoding="utf-8") as f:
                 json.dump(content, f, indent=2, ensure_ascii=False)
 
         return content
@@ -117,6 +116,11 @@ class PDF_Document:
         doc = fitz.open(self.file_path)
         toc = doc.get_toc(simple=False)  # returns [level, title, page number, ...]
         total_page = len(doc)
+
+        # if no table of contents, then extract the full text
+        if total_page == 0:
+            return self._extract_full_text()
+
         cleaner = Cleaner()
 
         chunks = {}
@@ -169,6 +173,7 @@ class PDF_Document:
                 chunk_id += 1
 
         if self.save_structure:
+            mkdir_if_not_exists(self.save_dir)
             with open(osp.join(self.save_dir, 'structure.json'), "w", encoding="utf-8") as f:
                 json.dump(chunks, f, indent=2, ensure_ascii=False)
         
@@ -327,12 +332,12 @@ class PDF_Document:
         return output
 
 def main():
-    path = 'datasets/books/Self-Development/Atomic Habits.pdf'
+    path = 'datasets/books/Literature/The Picture of Dorian Gray _ Project Gutenberg.pdf'
 
     with open('config.json', 'r') as f:
         config = json.load(f)
 
-    document = PDF_Document(path, config, save_structure=True, save_metadata=False)
+    document = PDF_Document(path, config, save_structure=True, save_metadata=True)
 
 if __name__ == "__main__":
     main()

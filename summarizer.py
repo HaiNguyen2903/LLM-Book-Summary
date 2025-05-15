@@ -3,11 +3,11 @@ import openai
 import json
 from utils import mkdir_if_not_exists
 import os.path as osp
-# from deepeval import evaluate
 from deepeval.test_case import LLMTestCase
 from deepeval.metrics import SummarizationMetric
 from document import PDF_Document
 from utils import save_txt_and_md_file
+import argparse
 
 class Summarizer:
     def __init__(self, config):
@@ -32,7 +32,7 @@ class Summarizer:
         summaries = {}
         id = 0
         for chunk_id, chunk in chunks.items():
-            if id >= 2:
+            if id >= 4:
                 return summaries
             
             text = chunk['text']
@@ -93,7 +93,7 @@ class Summarizer:
 
         return toc + '\n\n' + content
     
-    def _get_doc_summary(self, document: PDF_Document, summary_prompt_path: str, save=True) -> str:
+    def _get_doc_summary(self, document: PDF_Document, summary_prompt_path: str, save=True, summary_style: str = 'analytic') -> str:
         doc_contents = document.contents
         
         summary_prompt = self._load_prompt(summary_prompt_path)
@@ -107,7 +107,7 @@ class Summarizer:
         mkdir_if_not_exists(save_dir)
 
         if save:
-            with open(osp.join(save_dir, 'summary.json'), 'w') as f:
+            with open(osp.join(save_dir, f'summary_{summary_style}.json'), 'w') as f:
                 json.dump(final_summary, f, indent=2, ensure_ascii=False)
 
         return final_summary
@@ -197,21 +197,35 @@ class Summarizer:
 def main():
     openai.api_key = os.getenv("OPENAI_API_KEY")
 
+    parser = argparse.ArgumentParser(description="Book summarizer")
+    parser.add_argument('--style', type=str, default='analytic', help='summary style')
+    parser.add_argument('--doc_path', type=str, default='datasets/books/Self-Development/Atomic Habits.pdf', help='document path')
+    
+    args = parser.parse_args()
+
     with open('config.json', 'r') as f:
         config = json.load(f)
 
     summarizer = Summarizer(config=config)
 
-    doc_path = 'datasets/books/Self-Development/Rich Dad Poor Dad.pdf'
-    doc = PDF_Document(doc_path, config=config)
+    doc = PDF_Document(file_path=args.doc_path, config=config)
     
-    summary_prompt_path = osp.join(config["PROMPT_DIR"], "summary_cot_narrative.txt")
+    summary_style = args.style
+    assert summary_style in ['analytic', 'narrative', 'bullet_points'], "Invalid summary style"
+
+    if summary_style == 'analytic':
+        summary_prompt_path = osp.join(config["PROMPT_DIR"], "summary_cot_analytic_style.txt")
+    elif summary_style == 'narrative':
+        summary_prompt_path = osp.join(config["PROMPT_DIR"], "summary_cot_narrative_style.txt")
+    else:
+        summary_prompt_path = osp.join(config["PROMPT_DIR"], "summary_cot_bullet_points_style.txt")
 
     summarizer._get_doc_summary(document=doc,
                             summary_prompt_path=summary_prompt_path,
-                            save=True)
-
-
+                            save=True,
+                            summary_style=summary_style)
+    
+    
     # self_reflect_prompt_path = osp.join(config['PROMPT_DIR'], 'self_reflect_cot.txt')
 
     # summary = agent._get_self_reflective_summary(input_text=input, summary_prompt_path=summary_prompt_path,
