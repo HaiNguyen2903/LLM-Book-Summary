@@ -138,7 +138,7 @@ if __name__ == '__main__':
             "description": "Concise, analytical, and natural-sounding summary in the book's intellectual voice."
         },
         "Bullet-Point Summary": {
-            "prompt_file": "summary_cot_bullet_style.txt",
+            "prompt_file": "summary_cot_bullet_points_style.txt",
             "description": "Clear, scannable bullet-point summary for quick reference."
         },
         "Narrative Summary": {
