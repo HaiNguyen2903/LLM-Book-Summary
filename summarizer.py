@@ -32,7 +32,7 @@ class Summarizer:
         summaries = {}
         id = 0
         for chunk_id, chunk in chunks.items():
-            if id >= 4:
+            if id >= 3:
                 return summaries
             
             text = chunk['text']

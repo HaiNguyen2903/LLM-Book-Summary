@@ -4,3 +4,5 @@ outputs/
 notes.md
 datasets/
 temp/
+books.db
+test_db.py
