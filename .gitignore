@@ -6,3 +6,5 @@ datasets/
 temp/
 books.db
 test_db.py
+eda.ipynb
+app_book_collection.py
