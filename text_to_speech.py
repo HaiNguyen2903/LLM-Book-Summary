@@ -1,8 +1,8 @@
 import openai
-import os
-from utils import mkdir_if_not_exists, save_txt_and_md_file
+from utils import mkdir_if_not_exists
 import os.path as osp
 import json 
+import argparse
 
 class TextToSpeech:
     def __init__(self, config):
@@ -66,12 +66,18 @@ class TextToSpeech:
         return self.available_voices
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Text to speech")
+    parser.add_argument('--summary_path', type=str, required=True, help='path to summary file (.md or .txt format)')
+    
+    args = parser.parse_args()
+
     with open('config.json', 'r') as f:
         config = json.load(f)
 
     text_to_speech = TextToSpeech(config)
 
-    with open('outputs/Self-Development/Atomic Habits/summary.md', 'r') as f:
+    with open(args.summary_path, 'r') as f:
         text = f.read()
 
+    mkdir_if_not_exists("outputs/speech")
     text_to_speech.generate_speech(text=text, output_dir="outputs/speech", save=True)

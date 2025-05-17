@@ -37,8 +37,13 @@ In order to use OpenAI API key, activate your virtual enviroment and run the fol
 export OPENAI_API_KEY="YOUR_API_KEY"
 ```
 
-# Run the application
-In order to run the streamlit app, run:
+# Usage Guidline
+In order to run the main app, run:
 ```
 streamlit run app.py
+```
+
+In order to convert a summary file to speech, run
+```
+python text_to_speech.py {your_summary_path (.md or .txt format)}
 ```
