@@ -4,9 +4,7 @@ import fitz
 import os.path as osp
 import json
 from utils import Cleaner
-import glob
 from utils import mkdir_if_not_exists
-from IPython import embed
 
 class PDF_Document:
     def __init__(self, file_path: str, config: dict, 
