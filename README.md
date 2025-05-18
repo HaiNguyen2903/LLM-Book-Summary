@@ -1,3 +1,22 @@
+# Table of Contents
+
+- [About the Application](#about-the-application)
+- [System Architecture](#system-architecture)
+  - [Workflow](#workflow)
+  - [Database Design](#database-design)
+- [Result Demonstrations](#result-demonstrations)
+  - [Evaluation](#evaluation)
+- [Installation Guidline](#installation-guidline)
+  - [Clone this project](#clone-this-project)
+  - [Create a conda environment:](#create-a-conda-environment)
+  - [Activate the created environment:](#activate-the-created-environment)
+  - [Install neccessary packages:](#install-neccessary-packages)
+  - [Export API key to local environment](#export-api-key-to-local-environment)
+- [Usage Guidline](#usage-guidline)
+  - [Streamlit app](#streamlit-app)
+  - [Text to speech](#text-to-speech)
+
+
 # About the Application
 The application enables users to upload their PDF books and effortlessly generate high-quality summaries and insights from the original text, making it easy to quickly grasp key information and value from their reading materials. Additionally, a text-to-speech feature has been integrated to help users consume their content more conveniently.
 
@@ -8,8 +27,6 @@ The app offers various summary styles to cater to different needs:
 - **Narrative Summary**: A story-focused summary that highlights the narrative and characters.
 
 Users can also download their summarized content for offline access, ensuring they can save and revisit their reading materials anytime.
-
-<!-- ![Application Demo](images/demo_output.png) -->
 
 <style>
   figcaption {
@@ -71,7 +88,7 @@ The images reveal that analytic summaries employ formal, in-depth analysis with 
   <figcaption>Narrative Summary</figcaption>
 </figure>
 
-## Evaluation
+# Evaluation
 [DeepEval framework](https://www.deepeval.com) with CustomMetric was leveraged to evaluate the summary qualities. 2 crucial metrics were calculated:
 
 - **Alignment Score**: For alignment, the evaluator LLM generates a list of claims from the summary, and for each claim, the LLM will determine how many of these claims are supported by truths which are extracted from the source text

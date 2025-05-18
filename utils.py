@@ -125,7 +125,33 @@ def epub_to_text(epub_path):
             text_content.append(chapter_text)
     return '\n'.join(text_content)
 
+def add_toc(content: str) -> str:        
+        # Extract headers and their levels
+        headers = []
+        for line in content.split('\n'):
+            if line.startswith('#'):
+                level = len(line.split()[0])
+                title = ' '.join(line.split()[1:])
+                headers.append((level, title))
+        
+        # Generate TOC with clickable links
+        toc = "# Table of Contents\n\n"
+        for level, title in headers:
+            indent = '  ' * (level - 1)
+            # Create anchor by converting to lowercase, replacing spaces with hyphens
+            # and removing special characters
+            anchor = title.lower().replace(' ', '-')
+            anchor = ''.join(c for c in anchor if c.isalnum() or c == '-')
+            toc += f"{indent}- [{title}](#{anchor})\n"
+
+        return toc + '\n\n' + content
+
 def main():
+    with open('README.md', 'r') as f:
+        content = f.read()
+    toc = add_toc(content)
+    with open('README_TOC.md', 'w') as f:
+        f.write(toc)
     return
 
 if __name__ == "__main__":
