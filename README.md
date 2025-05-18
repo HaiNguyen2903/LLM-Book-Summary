@@ -29,7 +29,7 @@ The app offers various summary styles to cater to different needs:
 Users can also download their summarized content for offline access, ensuring they can save and revisit their reading materials anytime.
 
 <figure>
-  <img src="images/demo_output.png" alt="Image description" style="width: 90%;">
+  <img src="images/demo_output.png" alt="Image description" style="width: 100%;">
 </figure>
 
 # Installation Guidline
@@ -77,7 +77,7 @@ streamlit run app.py
 The app allows users to upload pdf file, select appropriate summary style and download the content after finishing.
 
 <figure>
-  <img src="images/demo_features.png" alt="Image description" style="width: 90%;">
+  <img src="images/demo_features.png" alt="Image description" style="width: 100%;">
 </figure>
 
 ## Text to speech
@@ -147,7 +147,7 @@ The Final Score is calculated with the following formula:
 $\text{Final Score} = \frac{\text{Alignment Score} \cdot \text{Coverage Score}}{\text{Alignment Score} + \text{Coverage Score}}$.
 
 <figure>
-  <img src="images/eval_score.png" alt="Image description" style="width:60%;">
+  <img src="images/eval_score.png" alt="Image description" style="width:90%;">
 </figure>
 
 The data indicates that narrative summaries achieved the highest overall performance, exemplified by a score of 0.85 for "Atomic Habits," attributed to their inherent fluidity and storytelling quality. Analytical summaries provided exact alignment and were optimal for concept-dense literature, but bullet-point summaries enhanced clarity and comprehensiveness for rapid reading.
