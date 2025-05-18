@@ -1,6 +1,12 @@
 # Table of Contents
 
 - [About the Application](#about-the-application)
+- [Installation Guidline](#installation-guidline)
+  - [Clone this project](#clone-this-project)
+  - [Create a conda environment:](#create-a-conda-environment)
+  - [Activate the created environment:](#activate-the-created-environment)
+  - [Install neccessary packages:](#install-neccessary-packages)
+  - [Export API key to local environment](#export-api-key-to-local-environment)
 - [Usage Guidline](#usage-guidline)
   - [Streamlit app](#streamlit-app)
   - [Text to speech](#text-to-speech)
@@ -9,12 +15,6 @@
   - [Database Design](#database-design)
 - [Result Demonstrations](#result-demonstrations)
   - [Evaluation](#evaluation)
-- [Installation Guidline](#installation-guidline)
-  - [Clone this project](#clone-this-project)
-  - [Create a conda environment:](#create-a-conda-environment)
-  - [Activate the created environment:](#activate-the-created-environment)
-  - [Install neccessary packages:](#install-neccessary-packages)
-  - [Export API key to local environment](#export-api-key-to-local-environment)
 
 
 # About the Application
@@ -147,7 +147,7 @@ The Final Score is calculated with the following formula:
 $\text{Final Score} = \frac{\text{Alignment Score} \cdot \text{Coverage Score}}{\text{Alignment Score} + \text{Coverage Score}}$.
 
 <figure>
-  <img src="images/eval_score.png" alt="Image description" style="width:90%;">
+  <img src="images/eval_score.png" alt="Image description" style="width:70%;">
 </figure>
 
 The data indicates that narrative summaries achieved the highest overall performance, exemplified by a score of 0.85 for "Atomic Habits," attributed to their inherent fluidity and storytelling quality. Analytical summaries provided exact alignment and were optimal for concept-dense literature, but bullet-point summaries enhanced clarity and comprehensiveness for rapid reading.
