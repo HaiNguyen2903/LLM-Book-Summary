@@ -1,13 +1,13 @@
 # Table of Contents
 
 - [About the Application](#about-the-application)
-- [Installation Guidline](#installation-guidline)
+- [Installation Guideline](#installation-guideline)
   - [Clone this project](#clone-this-project)
   - [Create a conda environment:](#create-a-conda-environment)
   - [Activate the created environment:](#activate-the-created-environment)
   - [Install neccessary packages:](#install-neccessary-packages)
   - [Export API key to local environment](#export-api-key-to-local-environment)
-- [Usage Guidline](#usage-guidline)
+- [Usage Guideline](#usage-guideline)
   - [Streamlit app](#streamlit-app)
   - [Text to speech](#text-to-speech)
 - [System Architecture](#system-architecture)
@@ -32,7 +32,7 @@ Users can also download their summarized content for offline access, ensuring th
   <img src="images/demo_output.png" alt="Image description" style="width: 100%;">
 </figure>
 
-# Installation Guidline
+# Installation Guideline
 
 ## Clone this project
 To clone this project, run:
@@ -66,7 +66,7 @@ In order to use OpenAI API key, activate your virtual enviroment and run the fol
 export OPENAI_API_KEY="YOUR_API_KEY"
 ```
 
-# Usage Guidline
+# Usage Guideline
 
 ## Streamlit app
 In order to run the main app, run:
