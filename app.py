@@ -67,58 +67,6 @@ def init_db():
     conn.commit()
     conn.close()
 
-def store_book_info(doc, summary_style, summary_data):
-    """Store book information and summaries in the database"""
-    conn = sqlite3.connect('books.db')
-    c = conn.cursor()
-    
-    try:
-        # Insert book information
-        c.execute('''
-            INSERT INTO books (author, book_name, total_pages, created_at)
-            VALUES (?, ?, ?, ?)
-        ''', (
-            doc.author,
-            doc.name,
-            len(doc.pages),
-            datetime.now()
-        ))
-        
-        book_id = c.lastrowid
-        
-        # Insert chunks
-        chunk_ids = []
-        for i, chunk_text in enumerate(doc.chunks):
-            c.execute('''
-                INSERT INTO chunks (book_id, chunk_text, chunk_index)
-                VALUES (?, ?, ?)
-            ''', (book_id, chunk_text, i))
-            chunk_ids.append(c.lastrowid)
-        
-        # Insert summary
-        c.execute('''
-            INSERT INTO summaries (book_id, summary_style, created_at)
-            VALUES (?, ?, ?)
-        ''', (book_id, summary_style, datetime.now()))
-        
-        summary_id = c.lastrowid
-        
-        # Insert chunk summaries
-        for chunk_id, chunk_summary in zip(chunk_ids, summary_data['chunks']):
-            c.execute('''
-                INSERT INTO chunk_summaries (summary_id, chunk_id, chunk_summary)
-                VALUES (?, ?, ?)
-            ''', (summary_id, chunk_id, chunk_summary))
-        
-        conn.commit()
-        return True
-        
-    except sqlite3.IntegrityError:
-        conn.rollback()
-        return False
-    finally:
-        conn.close()
-
 def init_session_state():
     if 'uploaded_file' not in ss:
         ss.uploaded_file = None
@@ -211,7 +159,6 @@ def update_book_info():
 def update_book_info_to_db():
     # if book info updated is false and uploaded file is not none
     if ss.book_info_updated is False and ss.uploaded_file is not None:
-        """Store book information and summaries in the database"""
         conn = sqlite3.connect('books.db')
         c = conn.cursor()
         
@@ -370,6 +317,7 @@ if __name__ == '__main__':
     # App title and description
     st.title("📕 LLM Book Summarizer")
     st.markdown("Upload a PDF document to view its metadata and summary.")
+    st.markdown("**Notes**: Please remove your current PDF file before uploading a new one.")
 
     # # File uploader
     uploaded_file = st.file_uploader("Upload PDF", type="pdf")
@@ -384,8 +332,5 @@ if __name__ == '__main__':
     update_book_info()
     # update book info to database
     update_book_info_to_db()
-    st.write(ss.book_id)
     # update summary 
     update_summary()   
-    # update summary to database
-    # update_summary_to_db()
